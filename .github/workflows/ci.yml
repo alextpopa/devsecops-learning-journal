@@ -20,8 +20,10 @@ jobs:
       - name: Run test Nginx container
         run: |
           docker run -d -p 8080:80 --name test-nginx nginx
+          echo "Waiting for Nginx to start...."
+          sleep 3
           docker ps
-          curl http://localhost:8080
+          curl -I http://localhost:8080
 
       # 4. Run a simple command to verify automation is working
       - name: Run verification script
