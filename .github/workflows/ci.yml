@@ -13,8 +13,17 @@ jobs:
       # 1. Download your repository code onto the runner
       - name: Checkout code
         uses: actions/checkout@v4
+      # 2. Verify Docker is available on the runner
+      - name: Check Docker version
+        run: docker --version
+      # 3. Spin up an Nginx container *inside* Github;s cloud runner to test it
+      - name: Run test Nginx container
+        run: |
+          docker run -d -p 8080:80 --name test-nginx nginx
+          docker ps
+          curl http://localhost:8080
 
-      # 2. Run a simple command to verify automation is working
+      # 4. Run a simple command to verify automation is working
       - name: Run verification script
         run: |
           echo "Pipeline triggered successfully!"
