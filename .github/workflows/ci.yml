@@ -1,25 +1,22 @@
 name: DevSecOps CI Pipeline
 
-#Trigger this pipeline on every push to the main branch
-
-
+# Trigger this pipeline on every push to the main branch
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    #1. Download your repo code onto the runner
+      # 1. Download your repository code onto the runner
       - name: Checkout code
         uses: actions/checkout@v4
 
-
-#2. Run a simple command to verify automation is working
-       - name: Run verfication script
-         run: |
-           echo "Pipeline triggered successfully"
-         echo "Listing repository files:"
-         ls -la
+      # 2. Run a simple command to verify automation is working
+      - name: Run verification script
+        run: |
+          echo "Pipeline triggered successfully!"
+          echo "Listing repository files:"
+          ls -la
