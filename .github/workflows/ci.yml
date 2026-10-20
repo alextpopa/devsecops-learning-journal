@@ -32,7 +32,7 @@ jobs:
       - name: Run Dependency Vulnerability Scan (pip-audit)
         run: |
           echo "Checking Python dependencies for known CVEs..."
-          pip install pip-bandit
+          pip install pip-audit
           if [ ! -f requirements.txt ]; then echo "requests==2.31.1" > requirements.txt; fi
           pip-audit -r requirements.txt || true
 
