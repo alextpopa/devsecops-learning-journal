@@ -34,4 +34,4 @@ jobs:
           image-ref: 'nginx:latest'
           format: 'table'
           exit-code: '0'
-          vuln-type: 'os,package'
+          vuln-type: 'os,library'
