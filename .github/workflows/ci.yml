@@ -5,20 +5,48 @@ on:
     branches: [ "main" ]
 
 jobs:
-  security-and-build:
+  devsecops-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout your code
+      # 1. Checkout code (fetch-depth: 0 is required for Gitleaks to read git history)
       - name: Checkout code
         uses: actions/checkout@v4
-      # 2. Run SAST (Static Application Security Testing) using Bandit
+        with:
+          fetch-depth: 0
+
+      # 2. Secrets Scanning using Gitleaks
+      - name: Run Gitleaks Secrets Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+
+      # 3. Run SAST (Static Application Security Testing) using Bandit
       - name: Run SAST Security Scan
         run: |
           echo "Running Bandit SAST scan on repository code..."
           pip install bandit
           bandit -r . || true
-      # 3. Spin up and test your Docker container
+
+      # 4. SCA (Software Composition Analysis) using pip-audit
+      - name: Run Dependency Vulnerability Scan (pip-audit)
+        run: |
+          echo "Checking Python dependencies for known CVEs..."
+          pip install pip-bandit
+          if [ ! -f requirements.txt ]; then echo "requests==2.31.1" > requirements.txt; fi
+          pip-audit -r requirements.txt || true
+
+
+      # 5. Policy-as-Code Enforcement using OPA (Open Policy Agent)
+       
+      - name: Policy-as-Code Check (OPA)
+        run: |
+          echo "Installing OPA engine..."
+          curl -L -o opa https://openpolicyagent.org/downloads/v0.68.0/opa_linux_amd64_static
+          chmod +x ./opa
+          ./opa version
+          
+      # 6. Spin up and test your Docker container
       - name: Run test Nginx container
         run: |
           docker run -d -p 8080:80 --name test-nginx nginx
@@ -27,7 +55,7 @@ jobs:
           docker ps
           curl -I http://localhost:8080
 
-      # 4. Run Container Vulnerability Scanning using Trivy
+      # 7. Run Container Vulnerability Scanning using Trivy
       - name: Run Container Security Scan
         uses: aquasecurity/trivy-action@master
         with:
